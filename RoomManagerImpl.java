@@ -18,8 +18,8 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
     }
 
     @Override
-    public List<Rooms> getRoomsAvailbale() throws RemoteException, SQLException {
-        List <Rooms> list = new ArrayList<>();
+    public List<Room> getRoomsAvailable() throws RemoteException, SQLException {
+        List <Room> list = new ArrayList<>();
 
         try{
             Class.forName("com.mysql.jdbc.Driver");
@@ -37,7 +37,7 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
             String Size = rs.getString("Size");
             String Cost = rs.getString("Cost");
 
-            Rooms room = new Rooms();
+            Room room = new Room();
             room.setType(Type);
             room.setCapacity(Capacity);
             room.setSize(Size);
@@ -53,22 +53,36 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
 
         try{
             Class.forName("com.mysql.jdbc.Driver");
+
+            if(roomType >=0 && roomType < 5) {
+                String roomTypeChange = Integer.toString(roomType);
+                Connection con = DriverManager.getConnection(dbURL, username, password);
+                String costOfRoom = "SELECT Cost FROM Rooms WHERE Type = " + roomType;
+                System.out.println(costOfRoom);
+                String reserv = "INSERT INTO Reservation(Type,Name,Cost) values(?,?,?)";
+
+                PreparedStatement pst = con.prepareStatement(reserv);
+                pst.setString(1, roomTypeChange);
+                pst.setString(2, guestName);
+                pst.setString(3, costOfRoom);
+                pst.execute();
+                System.out.println("Booking successful");
+                con.close();
+                return true;
+            }
+            else {
+                System.out.println("why false");
+                return false;
+
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            System.out.println("e");
+            return false;
+        }catch ( SQLException e ){
+            e.printStackTrace();
+            return false;
         }
-        Connection con = DriverManager.getConnection(dbURL, username, password);
-        Statement st = con.createStatement();
-        String availableRooms = "SELECT Type,Capacity FROM Rooms WHERE Capacity >=1 AND Type = "+roomType;
-        ResultSet rs = st.executeQuery(availableRooms);
-        System.out.println("insidehotelbook");
-        while (rs.next()) {
-            int Type = rs.getInt("Type");
-            int Capacity = rs.getInt("Capacity");
-            if(Capacity >=1)
-                System.out.println("Booked room for " + guestName);
-        }
-        rs.close();
-     return true;
     }
     @Override
     public List<String> hotelClientGuests() throws RemoteException {
