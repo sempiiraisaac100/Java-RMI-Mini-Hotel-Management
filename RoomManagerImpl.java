@@ -57,14 +57,17 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
             if(roomType >=0 && roomType < 5) {
                 String roomTypeChange = Integer.toString(roomType);
                 Connection con = DriverManager.getConnection(dbURL, username, password);
-                String costOfRoom = "SELECT Cost FROM Rooms WHERE Type = " + roomType;
-                System.out.println(costOfRoom);
-                String reserv = "INSERT INTO Reservation(Type,Name,Cost) values(?,?,?)";
+                String costOfRoom = "SELECT Cost FROM Rooms WHERE Type ='"+roomType+"'";
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery(costOfRoom);
+                rs.next();
+                String cost = rs.getString("Cost");
 
+                String reserv = "INSERT INTO Reservation(Type,Name,Cost) values(?,?,?)";
                 PreparedStatement pst = con.prepareStatement(reserv);
                 pst.setString(1, roomTypeChange);
                 pst.setString(2, guestName);
-                pst.setString(3, costOfRoom);
+                pst.setString(3, cost);
                 pst.execute();
                 System.out.println("Booking successful");
                 con.close();
