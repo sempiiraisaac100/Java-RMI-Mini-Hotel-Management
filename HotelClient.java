@@ -49,7 +49,10 @@ public class HotelClient {
                         break;
                     case "guests":
                         if(args.length == 2){
-                            c.hotelClientGuests();
+                            List<Guest> list =  c.hotelClientGuests();
+                            for (Guest r :list){
+                                System.out.println("Name : "+r.getName());
+                            }
                         }else printUsage();
                         break;
                     case "book":
@@ -59,7 +62,11 @@ public class HotelClient {
                         break;
                     case "revenue":
                         if(args.length == 2){
-
+                            List<Revenue> list =  c.hotelClientRevenue();
+                            for (Revenue r :list){
+                                System.out.println("Type : "+r.getType());
+                                System.out.println("Cost : "+r.getCost());
+                            }
                         }else printUsage();
                         break;
                     default:
@@ -82,9 +89,10 @@ public class HotelClient {
     }
     static private void printUsage() {
         System.out.println("Incorrect command usage");
-        System.out.println("Available options:\n\thotelclient <address> list\n" +
-                "\thotelclient <address> book <type> <Guest name>\n" +
-                "\thotelclient <address> guests\n");
+        System.out.println("Available options:\n\thotelclient list <address>\n" +
+                "\thotelclient book <address> <type> <Guest name>\n" +
+                "\thotelclient guests <address>\n" +
+                "\thotelclient revenue <address>\n");
     }
 
     static private void handleBook(String[] args, RoomManager r) throws SQLException, RemoteException {

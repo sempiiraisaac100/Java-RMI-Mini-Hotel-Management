@@ -57,23 +57,23 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
             if(roomType >=0 && roomType < 5) {
                 String roomTypeChange = Integer.toString(roomType);
                 Connection con = DriverManager.getConnection(dbURL, username, password);
-                String costOfRoom = "SELECT Cost FROM Rooms WHERE Type ='"+roomType+"'";
-                Statement st = con.createStatement();
-                ResultSet rs = st.executeQuery(costOfRoom);
-                rs.next();
-                String cost = rs.getString("Cost");
 
-                String reserv = "INSERT INTO Reservation(Type,Name,Cost) values(?,?,?)";
-                PreparedStatement pst = con.prepareStatement(reserv);
-                pst.setString(1, roomTypeChange);
-                pst.setString(2, guestName);
-                pst.setString(3, cost);
-                pst.execute();
-                System.out.println("Booking successful");
-                con.close();
-                return true;
-            }
-            else {
+                    String costOfRoom = "SELECT Cost FROM Rooms WHERE Type ='" + roomType + "'";
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery(costOfRoom);
+                    rs.next();
+                    String cost = rs.getString("Cost");
+
+                    String reserv = "INSERT INTO Reservation(Type,Name,Cost) values(?,?,?)";
+                    PreparedStatement pst = con.prepareStatement(reserv);
+                    pst.setString(1, roomTypeChange);
+                    pst.setString(2, guestName);
+                    pst.setString(3, cost);
+                    pst.execute();
+                    System.out.println("Booking successful");
+                    con.close();
+                    return true;
+                }else {
                 System.out.println("why false");
                 return false;
 
@@ -88,13 +88,57 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
         }
     }
     @Override
-    public List<String> hotelClientGuests() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<Guest> hotelClientGuests() throws RemoteException, SQLException {
+        List <Guest> list1 = new ArrayList<>();
+
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Connection con = DriverManager.getConnection(dbURL, username, password);
+        Statement st = con.createStatement();
+        String availableReservation = "SELECT * FROM Reservation";
+        ResultSet rs = st.executeQuery(availableReservation);
+
+        while (rs.next()) {
+            String Name = rs.getString("Name");
+
+            Guest reserv = new Guest();
+            reserv.setName(Name);
+            list1.add(reserv);
+        }
+        rs.close();
+        return list1;
+
     }
 
     @Override
-    public List<String> hotelClientRevenue() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<Revenue> hotelClientRevenue() throws RemoteException, SQLException {
+
+        List <Revenue> list2 = new ArrayList<>();
+
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Connection con = DriverManager.getConnection(dbURL, username, password);
+        Statement st = con.createStatement();
+        String revenueFromRooms = "SELECT * FROM Reservation GROUP BY `Type`";
+        ResultSet rs = st.executeQuery(revenueFromRooms);
+
+        while (rs.next()) {
+            int Type = rs.getInt("Type");
+            String Cost = rs.getString("Cost");
+
+            Revenue re = new Revenue();
+            re.setType(Type);
+            re.setCost(Cost);
+            list2.add(re);
+        }
+        rs.close();
+        return list2;
     }
     
 }

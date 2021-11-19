@@ -10,7 +10,7 @@ import java.util.List;
 public interface RoomManager extends Remote{
     List<Room> getRoomsAvailable() throws RemoteException, SQLException;
     boolean hotelClientBook(int roomType, String guestName) throws RemoteException, SQLException;
-    List<String> hotelClientGuests() throws RemoteException;
-    List<String> hotelClientRevenue() throws RemoteException;
+    List<Guest> hotelClientGuests() throws RemoteException, SQLException;
+    List<Revenue> hotelClientRevenue() throws RemoteException, SQLException;
     
     }
