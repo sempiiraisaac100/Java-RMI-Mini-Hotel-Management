@@ -5,7 +5,7 @@ public class Revenue implements Serializable {
 
     //declaring variables only visible to this class
     private int Type;
-    private String Cost;
+    private int Cost;
 
     //creating methods that can be used to access declared private variables above
     public int getType() {
@@ -16,11 +16,11 @@ public class Revenue implements Serializable {
         Type = type;
     }
 
-    public String getCost() {
+    public int getCost() {
         return Cost;
     }
 
-    public void setCost(String cost) {
+    public void setCost(int cost) {
         Cost = cost;
     }
 }

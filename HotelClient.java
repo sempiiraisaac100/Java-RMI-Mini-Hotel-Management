@@ -6,10 +6,7 @@ import java.rmi.registry.Registry;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- *
- * @author o876
- */
+
 public class HotelClient {
 
     public static void main (String [] args) {
@@ -25,9 +22,8 @@ public class HotelClient {
                 Registry reg = LocateRegistry.getRegistry("localhost",1099);
 
                 try{
-
-                    String port = args[1].split(":")[1];
-
+                    String port = args[1].split(":")[1];  //get port string in the provided server address
+                    //check for validity length of the port string
                     if(port.length() < 1 || port.length() > 5){
 
                         System.out.println("Invalid server address supplied");
@@ -35,9 +31,8 @@ public class HotelClient {
                         System.exit(0);
 
                     }else{
-
-                        int portx = Integer.parseInt(port);
-
+                        int portx = Integer.parseInt(port); //convert port string-integer to integer
+                        //check if valid port range 
                         if(portx < 0 || portx > 65535) {
 
                             System.out.println("Invalid server address supplied");
@@ -52,9 +47,9 @@ public class HotelClient {
                     System.exit(0);
                 }
 
-                //to retrieve a remote object reference. Calling lookup() causes the server's RMI registry to be querie
-                RoomManager c = (RoomManager) reg.lookup("rmi://"+ args[1] + "/HotelService");
+                RoomManager c = (RoomManager) reg.lookup("rmi://"+ args[1] + "/HotelService"); //pass server address to the lookup method after validity check
 
+                //check passed command to take action 
                 switch (args[0]) {
                     case "list":
                         if(args.length == 2){
@@ -84,7 +79,7 @@ public class HotelClient {
                             List<Revenue> list =  c.hotelClientRevenue();
                             for (Revenue r :list){
                                 System.out.println("Type : "+r.getType());
-                                System.out.println("Cost : "+r.getCost());
+                                System.out.println("TOT : "+r.getCost());
                             }
                         }else printUsage();
                         break;
@@ -108,19 +103,24 @@ public class HotelClient {
     }
     static private void printUsage() {
         System.out.println("Incorrect command usage");
-        System.out.println("Available options:\n\thotelclient list <address>\n" +
-                "\thotelclient book <address> <type> <Guest name>\n" +
-                "\thotelclient guests <address>\n" +
-                "\thotelclient revenue <address>\n");
+        System.out.println("Available options:\n\tHotelclient list <address>\n" +
+                "\tHotelclient book <address> <type> <Guest name>\n" +
+                "\tHotelclient guests <address>\n" +
+                "\tHotelclient revenue <address>\n");
     }
 
     static private void handleBook(String[] args, RoomManager r) throws SQLException, RemoteException {
         String name = args[3];
         try{
             int type = Integer.parseInt(args[2]);
-            boolean result = r.hotelClientBook(type,name);
-            System.out.println(result);
 
+            // check if acceptable room type
+            if((type >= 0 && type < 5)){
+                boolean result = r.hotelClientBook(type,name);
+                System.out.println(result);
+            }else{
+                System.out.println("type should be between 0 and 4");
+            }
         }catch (NumberFormatException e){
             System.out.println("Invalid room type supplied");
             System.exit(0);
