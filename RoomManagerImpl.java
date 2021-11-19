@@ -100,7 +100,7 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
                 //establishing connection to the database using the loaded driver class
                 Connection con = DriverManager.getConnection(dbURL, username, password);
 
-                     //Query to fetch the cost of a roomType
+                     //Query to count the number rooms with a type requested by the guest
                     String NoOfBookedRooms = "SELECT `Type`,`Cost`,Count(*) as tot FROM `Reservation` WHERE Type ='"+roomType+"' GROUP BY Type";
                     
                      //creating an interface used to send a SQL query to the database
@@ -111,17 +111,29 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
 
                     //ensuring that we have results
                     rs.next();
+
+                    //Storing the number rooms with a type requested by the guest to a variable
                     int TotalNoOfBookedRooms = rs.getInt("tot");
 
-
+                    //Query to return the capacity of a room type requested by the guest
                     String TotalAvailableCapacity = "SELECT `Capacity`FROM `Rooms`WHERE Type ='"+roomType+"'";
+
+                    //creating an interface used to send a SQL query to the database
                     Statement st1 = con.createStatement();
+
+                    //executing the query through the st interface
                     ResultSet rs1 = st1.executeQuery(TotalAvailableCapacity);
+
+                    //ensuring that we have results
                     rs1.next();
+
+                    //Storing the capacity of a room type requested by the guest in a variable
                     int TotalAvailableCapacityValue = rs1.getInt("Capacity");
 
-
+                //ensuring that number of booked rooms of a given type don't exceed its set capacity
                 if (TotalNoOfBookedRooms < TotalAvailableCapacityValue) {
+
+                    //Query to fetch the cost of a room type
                     String costOfRoom = "SELECT Cost FROM Rooms WHERE Type ='" + roomType + "'";
                     Statement st2 = con.createStatement();
                     ResultSet rs2 = st2.executeQuery(costOfRoom);
@@ -129,6 +141,8 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
 
                     //Assigning the fetched cost to cost variable
                     String cost = rs2.getString("Cost");
+
+                    //converting the cost to integer value
                     int costFinal = Integer.parseInt(cost);
 
                     //query to insert a reservation made by the guest
@@ -216,28 +230,45 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
     //Returning the revenue obtained from each room type
     @Override
     public List<Revenue> hotelClientRevenue() throws RemoteException, SQLException {
+
+        //creating an object to store revenue
         List <Revenue> list2 = new ArrayList<>();
 
         try{
+            //loading the driver
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        //connecting to the database
         Connection con = DriverManager.getConnection(dbURL, username, password);
         Statement st = con.createStatement();
+
+        //Query to sum revenue by type
         String revenueFromRooms = "SELECT * ,SUM(Cost) AS TOT FROM Reservation GROUP BY Type";
         ResultSet rs = st.executeQuery(revenueFromRooms);
 
         while (rs.next()) {
+
+            //storing the room type and the revenue it generated
             int Type = rs.getInt("Type");
             int Cost = rs.getInt("TOT");
 
+            //instantiating the revenue data class
             Revenue re = new Revenue();
+
+            //Using revenue interface methods to set room type and its generated revenue
             re.setType(Type);
             re.setCost(Cost);
+
+            //adding the revenue of each type to the list
             list2.add(re);
         }
+        //closing the connection
         rs.close();
+
+        //returning revenue per room Type
         return list2;
     }
     
