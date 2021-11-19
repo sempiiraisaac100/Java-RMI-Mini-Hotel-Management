@@ -100,26 +100,17 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
                 //establishing connection to the database using the loaded driver class
                 Connection con = DriverManager.getConnection(dbURL, username, password);
 
-<<<<<<< HEAD
-                    //Query to fetch the cost of a roomType
-                    String costOfRoom = "SELECT Cost FROM Rooms WHERE Type ='" + roomType + "'";
-
-                    //creating an interface used to send a SQL query to the database
+                     //Query to fetch the cost of a roomType
+                    String NoOfBookedRooms = "SELECT `Type`,`Cost`,Count(*) as tot FROM `Reservation` WHERE Type ='"+roomType+"' GROUP BY Type";
+                    
+                     //creating an interface used to send a SQL query to the database
                     Statement st = con.createStatement();
 
                     //executing the query through the st interface
-                    ResultSet rs = st.executeQuery(costOfRoom);
+                    ResultSet rs = st.executeQuery(NoOfBookedRooms);
 
                     //ensuring that we have results
-                    rs.next();
-
-                    //Assigning the fetched cost to cost variable
-                    String cost = rs.getString("Cost");
-=======
-                    String NoOfBookedRooms = "SELECT `Type`,`Cost`,Count(*) as tot FROM `Reservation` WHERE Type ='"+roomType+"' GROUP BY Type";
-                    Statement st = con.createStatement();
-                    ResultSet rs = st.executeQuery(NoOfBookedRooms);
-                    rs.next();
+                    // rs.next();
                     int TotalNoOfBookedRooms = rs.getInt("tot");
 
 
@@ -135,9 +126,10 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
                     Statement st2 = con.createStatement();
                     ResultSet rs2 = st2.executeQuery(costOfRoom);
                     rs2.next();
+
+                    //Assigning the fetched cost to cost variable
                     String cost = rs2.getString("Cost");
                     int costFinal = Integer.parseInt(cost);
->>>>>>> 2b3c951aa510f5ab2dbb73ec309a517d27619f44
 
                     //query to insert a reservation made by the guest
                     String reserv = "INSERT INTO Reservation(Type,Name,Cost) values(?,?,?)";
@@ -148,13 +140,7 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
                     //passing guest data to the created interface
                     pst.setString(1, roomTypeChange);
                     pst.setString(2, guestName);
-<<<<<<< HEAD
-                    pst.setString(3, cost);
-
-                    //executing the query to register a guest reservation
-=======
                     pst.setInt(3, costFinal);
->>>>>>> 2b3c951aa510f5ab2dbb73ec309a517d27619f44
                     pst.execute();
 
                     //Echoing status
@@ -163,10 +149,6 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
                     //Closing the connection
                     con.close();
                     return true;
-<<<<<<< HEAD
-                }else {
-                System.out.println("Not Among the Available roomTypes");
-=======
                 }else{
                     System.out.println("Total No Of BookedRooms is greater than Total Available Capacity");
                     return  false;
@@ -174,7 +156,6 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
             }
                 else {
                 System.out.println("why false");
->>>>>>> 2b3c951aa510f5ab2dbb73ec309a517d27619f44
                 return false;
             }
 
