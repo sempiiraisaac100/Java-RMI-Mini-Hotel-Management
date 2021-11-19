@@ -110,7 +110,7 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
                     ResultSet rs = st.executeQuery(NoOfBookedRooms);
 
                     //ensuring that we have results
-                    // rs.next();
+                    rs.next();
                     int TotalNoOfBookedRooms = rs.getInt("tot");
 
 
