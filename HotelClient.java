@@ -6,10 +6,7 @@ import java.rmi.registry.Registry;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- *
- * @author o876
- */
+
 public class HotelClient {
 
     public static void main (String [] args) {
@@ -18,12 +15,14 @@ public class HotelClient {
             try{
                 Registry reg = LocateRegistry.getRegistry("localhost",1099);
                 try{
-                    String port = args[1].split(":")[1];
+                    String port = args[1].split(":")[1];  //get port string in the provided server address
+                    //check for validity length of the port string
                     if(port.length() < 1 || port.length() > 5){
                         System.out.println("Invalid server address supplied");
                         System.exit(0);
                     }else{
-                        int portx = Integer.parseInt(port);
+                        int portx = Integer.parseInt(port); //convert port string-integer to integer
+                        //check if valid port range 
                         if(portx < 0 || portx > 65535) {
                             System.out.println("Invalid server address supplied");
                             System.exit(0);
@@ -34,8 +33,9 @@ public class HotelClient {
                     System.exit(0);
                 }
 
-                RoomManager c = (RoomManager) reg.lookup("rmi://"+ args[1] + "/HotelService");
+                RoomManager c = (RoomManager) reg.lookup("rmi://"+ args[1] + "/HotelService"); //pass server address to the lookup method after validity check
 
+                //check passed command to take action 
                 switch (args[0]) {
                     case "list":
                         if(args.length == 2){
@@ -100,6 +100,7 @@ public class HotelClient {
         try{
             int type = Integer.parseInt(args[2]);
 
+            // check if acceptable room type
             if((type >= 0 && type < 5)){
                 boolean result = r.hotelClientBook(type,name);
                 System.out.println(result);
