@@ -1,10 +1,14 @@
 import java.io.Serializable;
 
+//Room class is a data class serialized to ease the storing and sending of its objects to other processes
 public class Room implements Serializable {
+
+    //declaring variables only visible to this class
     private int Type,Capacity;
     private String Size;
     private String Cost;
 
+    //creating methods that can be used to access declared private variables above
     public int getType() {
         return Type;
     }

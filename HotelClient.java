@@ -10,26 +10,40 @@ import java.util.List;
 public class HotelClient {
 
     public static void main (String [] args) {
-//        If not correct usage then print usage
+
+        //If not correct usage then print usage
+
+
         if(args.length > 1 && args.length <= 4) {
             try{
+
+                //Returns a reference to the remote object Registry for the local host
+                // on the default registry port of 1099
                 Registry reg = LocateRegistry.getRegistry("localhost",1099);
+
                 try{
                     String port = args[1].split(":")[1];  //get port string in the provided server address
                     //check for validity length of the port string
                     if(port.length() < 1 || port.length() > 5){
+
                         System.out.println("Invalid server address supplied");
+
                         System.exit(0);
+
                     }else{
                         int portx = Integer.parseInt(port); //convert port string-integer to integer
                         //check if valid port range 
                         if(portx < 0 || portx > 65535) {
+
                             System.out.println("Invalid server address supplied");
+
                             System.exit(0);
                         }
                     }
                 }catch (Exception e) {
+
                     System.out.println("Invalid server address supplied");
+
                     System.exit(0);
                 }
 
