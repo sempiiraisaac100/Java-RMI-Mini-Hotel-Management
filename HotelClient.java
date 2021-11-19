@@ -65,7 +65,7 @@ public class HotelClient {
                             List<Revenue> list =  c.hotelClientRevenue();
                             for (Revenue r :list){
                                 System.out.println("Type : "+r.getType());
-                                System.out.println("Cost : "+r.getCost());
+                                System.out.println("TOT : "+r.getCost());
                             }
                         }else printUsage();
                         break;
@@ -89,19 +89,23 @@ public class HotelClient {
     }
     static private void printUsage() {
         System.out.println("Incorrect command usage");
-        System.out.println("Available options:\n\thotelclient list <address>\n" +
-                "\thotelclient book <address> <type> <Guest name>\n" +
-                "\thotelclient guests <address>\n" +
-                "\thotelclient revenue <address>\n");
+        System.out.println("Available options:\n\tHotelclient list <address>\n" +
+                "\tHotelclient book <address> <type> <Guest name>\n" +
+                "\tHotelclient guests <address>\n" +
+                "\tHotelclient revenue <address>\n");
     }
 
     static private void handleBook(String[] args, RoomManager r) throws SQLException, RemoteException {
         String name = args[3];
         try{
             int type = Integer.parseInt(args[2]);
-            boolean result = r.hotelClientBook(type,name);
-            System.out.println(result);
 
+            if((type >= 0 && type < 5)){
+                boolean result = r.hotelClientBook(type,name);
+                System.out.println(result);
+            }else{
+                System.out.println("type should be between 0 and 4");
+            }
         }catch (NumberFormatException e){
             System.out.println("Invalid room type supplied");
             System.exit(0);

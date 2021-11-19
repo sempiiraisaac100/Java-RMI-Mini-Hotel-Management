@@ -58,25 +58,45 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
                 String roomTypeChange = Integer.toString(roomType);
                 Connection con = DriverManager.getConnection(dbURL, username, password);
 
-                    String costOfRoom = "SELECT Cost FROM Rooms WHERE Type ='" + roomType + "'";
+                    String NoOfBookedRooms = "SELECT `Type`,`Cost`,Count(*) as tot FROM `Reservation` WHERE Type ='"+roomType+"' GROUP BY Type";
                     Statement st = con.createStatement();
-                    ResultSet rs = st.executeQuery(costOfRoom);
+                    ResultSet rs = st.executeQuery(NoOfBookedRooms);
                     rs.next();
-                    String cost = rs.getString("Cost");
+                    int TotalNoOfBookedRooms = rs.getInt("tot");
+
+
+                    String TotalAvailableCapacity = "SELECT `Capacity`FROM `Rooms`WHERE Type ='"+roomType+"'";
+                    Statement st1 = con.createStatement();
+                    ResultSet rs1 = st1.executeQuery(TotalAvailableCapacity);
+                    rs1.next();
+                    int TotalAvailableCapacityValue = rs1.getInt("Capacity");
+
+
+                if (TotalNoOfBookedRooms < TotalAvailableCapacityValue) {
+                    String costOfRoom = "SELECT Cost FROM Rooms WHERE Type ='" + roomType + "'";
+                    Statement st2 = con.createStatement();
+                    ResultSet rs2 = st2.executeQuery(costOfRoom);
+                    rs2.next();
+                    String cost = rs2.getString("Cost");
+                    int costFinal = Integer.parseInt(cost);
 
                     String reserv = "INSERT INTO Reservation(Type,Name,Cost) values(?,?,?)";
                     PreparedStatement pst = con.prepareStatement(reserv);
                     pst.setString(1, roomTypeChange);
                     pst.setString(2, guestName);
-                    pst.setString(3, cost);
+                    pst.setInt(3, costFinal);
                     pst.execute();
                     System.out.println("Booking successful");
                     con.close();
                     return true;
-                }else {
+                }else{
+                    System.out.println("Total No Of BookedRooms is greater than Total Available Capacity");
+                    return  false;
+                }
+            }
+                else {
                 System.out.println("why false");
                 return false;
-
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -115,7 +135,6 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
 
     @Override
     public List<Revenue> hotelClientRevenue() throws RemoteException, SQLException {
-
         List <Revenue> list2 = new ArrayList<>();
 
         try{
@@ -125,12 +144,12 @@ public class RoomManagerImpl extends java.rmi.server.UnicastRemoteObject impleme
         }
         Connection con = DriverManager.getConnection(dbURL, username, password);
         Statement st = con.createStatement();
-        String revenueFromRooms = "SELECT * FROM Reservation GROUP BY `Type`";
+        String revenueFromRooms = "SELECT * ,SUM(Cost) AS TOT FROM Reservation GROUP BY Type";
         ResultSet rs = st.executeQuery(revenueFromRooms);
 
         while (rs.next()) {
             int Type = rs.getInt("Type");
-            String Cost = rs.getString("Cost");
+            int Cost = rs.getInt("TOT");
 
             Revenue re = new Revenue();
             re.setType(Type);

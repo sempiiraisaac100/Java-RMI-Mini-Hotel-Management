@@ -2,7 +2,7 @@ import java.io.Serializable;
 
 public class Revenue implements Serializable {
     private int Type;
-    private String Cost;
+    private int Cost;
 
     public int getType() {
         return Type;
@@ -12,11 +12,11 @@ public class Revenue implements Serializable {
         Type = type;
     }
 
-    public String getCost() {
+    public int getCost() {
         return Cost;
     }
 
-    public void setCost(String cost) {
+    public void setCost(int cost) {
         Cost = cost;
     }
 }
